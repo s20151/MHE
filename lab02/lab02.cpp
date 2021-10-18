@@ -22,14 +22,10 @@ vector<int> load(string path){
 }
 
 void print(vector<int> data){
-    if(data.size()>0){
         cout << "Given numbers:" << endl;
         cout << "{ ";
         for (int x: data) cout << x << " ";
         cout << "}" << endl;
-    }else {
-        cout<< "Could not find any data to print.";
-    }
 }
 
 bool isValid(vector<int> data){
