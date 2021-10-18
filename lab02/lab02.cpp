@@ -12,15 +12,12 @@ vector<int> load(string path){
     vector<int> data;
     ifstream file;
     file.open(path);
-    if(!file) {
-        cout<<"Error opening selected file.";
-        file.close();
-    }else {
+    if(file){
         int number;
         while (file >> number) data.push_back(number);
-        file.close();
         sort(data.begin(), data.end());
     }
+    file.close();
     return data;
 }
 
@@ -35,12 +32,25 @@ void print(vector<int> data){
     }
 }
 
+bool isValid(vector<int> data){
+    if(data.size()%3==0 && data.size()>=3) {
+        return true;
+    }else if(data.size()%3!=0) {
+        return false;
+    }else {
+        return false;
+    }
+}
 
 int main(int argc, char** argv) {
-    string dir = "C:\\Users\\Admin\\Desktop\\SEM5\\MHE\\lab02\\"; // Z:\MHE\lab02
+    string dir = "Z:\\MHE\\lab02\\"; // Z:\MHE\lab02
     if(argc == 2) {
         vector<int> data = load(dir + argv[1]);
-        print(data);
+        if(isValid(data)) {
+            print(data);
+        }else {
+            cout << "Loaded data is not valid. " << endl;
+        }
     }else {
         cout << "You did not enter file name."<<endl;
     }
