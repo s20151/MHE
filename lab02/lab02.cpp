@@ -15,7 +15,6 @@ vector<int> load(string path){
     if(file){
         int number;
         while (file >> number) data.push_back(number);
-        sort(data.begin(), data.end());
     }
     file.close();
     return data;
@@ -38,10 +37,22 @@ bool isValid(vector<int> data){
     }
 }
 
+double goal_function(vector<int> solution){}
+
+vector<int> generate_solution(vector<int> input){
+
+}
+
+vector<int> next_solution(vector<int> solution){}
+
+
+
+
+
+
 int main(int argc, char** argv) {
-    string dir = "Z:\\MHE\\lab02\\"; // Z:\MHE\lab02
-    if(argc == 2) {
-        vector<int> data = load(dir + argv[1]);
+    if(argc > 1) {
+        vector<int> data = load( argv[1] );
         if(isValid(data)) {
             print(data);
         }else {
