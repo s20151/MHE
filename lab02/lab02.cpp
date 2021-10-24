@@ -6,7 +6,7 @@
 
 using namespace std;
 
-//Przykład: {1 2 3 4 5 6} -> {1, 5, 9}, {2, 6, 7} suma = 15
+//Przykład: {1 2 5 6 7 9} -> {1, 5, 9}, {2, 6, 7} suma = 15
 
 vector<int> load(string path){
     vector<int> data;
@@ -91,14 +91,6 @@ int main(int argc, char** argv) {
             print_triplets(random, cout);
             double goal = goal_solution(random, 15);
             cout << "Goal solution: " << goal << endl;
-            while(goal>0){
-                random = generate_next_working_point(random, data);
-                goal = goal_solution(random,15);
-                print_triplets(random,cout);
-            }
-
-
-
 
         }else {
             cout << "Loaded data is not valid. " << endl;
