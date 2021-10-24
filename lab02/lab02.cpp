@@ -67,6 +67,12 @@ vector<vector<int>> generate_random_working_point(vector<int> input){
     return triplets;
 }
 
+vector<vector<int>> generate_next_working_point(vector<vector<int>> triplets, vector<int> numbers){
+    vector<vector<int>> new_triplets;
+    new_triplets = generate_random_working_point(numbers);
+    return new_triplets;
+}
+
 void print_triplets(vector<vector<int>> triplets, ostream &out){
     for (vector<int> x: triplets) print(x, out);
 }
@@ -83,9 +89,13 @@ int main(int argc, char** argv) {
             vector<vector<int>> random = generate_random_working_point(data);
             cout << "Random triplets:" << endl;
             print_triplets(random, cout);
-            double goal = goal_solution(random, 10);
+            double goal = goal_solution(random, 15);
             cout << "Goal solution: " << goal << endl;
-
+            while(goal>0){
+                random = generate_next_working_point(random, data);
+                goal = goal_solution(random,15);
+                print_triplets(random,cout);
+            }
 
 
 
