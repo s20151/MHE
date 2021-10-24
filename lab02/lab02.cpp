@@ -33,10 +33,11 @@ double goal_solution(vector<vector<int>> triplets, int desired_sum){
     return sum;
 }
 
-void print(vector<int> data){
-        cout << "{ ";
-        for (int x: data) cout << x << " ";
-        cout << "}" << endl;
+
+void print(vector<int> data, ostream &out){
+        out << "{ ";
+        for (int x: data) out << x << " ";
+        out << "}" << endl;
 }
 
 bool isValid(vector<int> data){
@@ -48,8 +49,6 @@ bool isValid(vector<int> data){
         return false;
     }
 }
-
-//double goal_function(vector<int> solution){}
 
 vector<vector<int>> generate_random_working_point(vector<int> input){
     vector<int> numbers = input;
@@ -68,13 +67,9 @@ vector<vector<int>> generate_random_working_point(vector<int> input){
     return triplets;
 }
 
-void print_triplets(vector<vector<int>> triplets){
-    for (vector<int> x: triplets) print(x);
+void print_triplets(vector<vector<int>> triplets, ostream &out){
+    for (vector<int> x: triplets) print(x, out);
 }
-
-//vector<int> next_solution(vector<int> solution){}
-
-
 
 
 
@@ -84,12 +79,17 @@ int main(int argc, char** argv) {
         vector<int> data = load( argv[1] );
         if(isValid(data)) {
             cout << "Given numbers:" << endl;
-            print(data);
+            print(data, cout);
             vector<vector<int>> random = generate_random_working_point(data);
             cout << "Random triplets:" << endl;
-            print_triplets(random);
+            print_triplets(random, cout);
             double goal = goal_solution(random, 10);
             cout << "Goal solution: " << goal << endl;
+
+
+
+
+
         }else {
             cout << "Loaded data is not valid. " << endl;
         }
