@@ -6,6 +6,7 @@
 
 using namespace std;
 
+
 //Przykład: {1 2 5 6 7 9} -> {1, 5, 9}, {2, 6, 7} suma = 15
 
 vector<int> load(string path){
@@ -20,17 +21,19 @@ vector<int> load(string path){
     return data;
 }
 
-double goal_solution(vector<vector<int>> triplets, int desired_sum){
-    double sum = 0;
-    for(int i = 0; i<triplets.size(); i++){
-        int triplet_sum = 0;
-        for(int j = 0; j<triplets[i].size(); j++){
-            triplet_sum += triplets[i][j];
-        }
-        if(triplet_sum != desired_sum) sum++;
-        if(triplets[i].size() != 3) sum++;
+double goal_solution(vector<int> data, vector<bool> generated_solution, int desired_sum){
+    int sum = 0;
+    double score = 0;
+    int element_count = 0;
+    for(int i = 0; i<data.size(); i++){
+        if(generated_solution[i]){
+          sum += data[i];
+          element_count++;
+        } 
     }
-    return sum;
+        if(sum != desired_sum) score++;
+        if(element_count != 3) score++;
+    return score;
 }
 
 
@@ -50,48 +53,47 @@ bool isValid(vector<int> data){
     }
 }
 
-vector<vector<int>> generate_random_working_point(vector<int> input){
-    vector<int> numbers = input;
-    int v_size = numbers.size();
-    vector<vector<int>> triplets;
-    for(int i=0; i<v_size/3; i++){
-        vector<int> triplet;
-        for(int j=0; j<3; j++){
-            srand( time( NULL ) );
-            int random_number = rand()%numbers.size();
-            triplet.push_back(numbers[random_number]);
-            numbers.erase(numbers.begin() + random_number);
-        }
-        triplets.push_back(triplet);
+vector<bool> generate_random_working_point_b(vector<int> input){
+    srand(time(NULL));
+    vector<bool> random_working_point;
+    for (int i = 0; i < input.size(); i++) {
+        random_working_point.push_back(rand() % 2);
     }
-    return triplets;
+    return random_working_point;
+}
+void generate_next_working_point_b(vector<bool> &random_working_point){
+    int i = 0;
+    do{
+       if(!random_working_point[i]){
+           random_working_point[i]=true;
+           break;
+       } else {
+           random_working_point[i]=false;
+           i++;
+           if(i==random_working_point.size()) i=0;
+       }
+    }while(true);
 }
 
-vector<vector<int>> generate_next_working_point(vector<vector<int>> triplets, vector<int> numbers){
-    vector<vector<int>> new_triplets;
-    new_triplets = generate_random_working_point(numbers);
-    return new_triplets;
+void print_solution(vector<bool> generated_soluton){
+            cout<<"{ ";
+            for(auto x: generated_soluton) cout<<x<<" ";
+            cout<<"}";
 }
-
-void print_triplets(vector<vector<int>> triplets, ostream &out){
-    for (vector<int> x: triplets) print(x, out);
-}
-
-
 
 
 int main(int argc, char** argv) {
-    if(argc > 1) {
-        vector<int> data = load( argv[1] );
+    if(argc == 1) {
+        vector<int> data = {1,2,4,5,6,3};
         if(isValid(data)) {
             cout << "Given numbers:" << endl;
             print(data, cout);
-            vector<vector<int>> random = generate_random_working_point(data);
-            cout << "Random triplets:" << endl;
-            print_triplets(random, cout);
-            double goal = goal_solution(random, 15);
-            cout << "Goal solution: " << goal << endl;
-
+            vector<bool> rand_working_p = generate_random_working_point_b(data);
+            cout<<"generated working point: "<<endl;
+            print_solution(rand_working_p);
+            generate_next_working_point_b(rand_working_p);
+            cout<<endl<<"next working point: "<<endl;
+            print_solution(rand_working_p);
         }else {
             cout << "Loaded data is not valid. " << endl;
         }
