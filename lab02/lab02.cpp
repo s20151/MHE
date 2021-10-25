@@ -50,27 +50,24 @@ bool isValid(vector<int> data){
     }
 }
 
-vector<vector<int>> generate_random_working_point(vector<int> input){
+vector<vector<int>> generate_working_point(vector<int> input){
     vector<int> numbers = input;
     int v_size = numbers.size();
+    int iterator = 0;
     vector<vector<int>> triplets;
     for(int i=0; i<v_size/3; i++){
         vector<int> triplet;
         for(int j=0; j<3; j++){
-            srand( time( NULL ) );
-            int random_number = rand()%numbers.size();
-            triplet.push_back(numbers[random_number]);
-            numbers.erase(numbers.begin() + random_number);
+            triplet.push_back(numbers[iterator]);
+            iterator++;
         }
         triplets.push_back(triplet);
     }
     return triplets;
 }
 
-vector<vector<int>> generate_next_working_point(vector<vector<int>> triplets, vector<int> numbers){
-    vector<vector<int>> new_triplets;
-    new_triplets = generate_random_working_point(numbers);
-    return new_triplets;
+void generate_next_working_point(vector<int> &numbers){
+   next_permutation(numbers.begin(), numbers.end());
 }
 
 void print_triplets(vector<vector<int>> triplets, ostream &out){
@@ -81,16 +78,19 @@ void print_triplets(vector<vector<int>> triplets, ostream &out){
 
 
 int main(int argc, char** argv) {
-    if(argc > 1) {
-        vector<int> data = load( argv[1] );
+    if(argc == 1) {
+        vector<int> data = {1,2,3,4,5,6};
         if(isValid(data)) {
             cout << "Given numbers:" << endl;
             print(data, cout);
-            vector<vector<int>> random = generate_random_working_point(data);
+            vector<vector<int>> random = generate_working_point(data);
             cout << "Random triplets:" << endl;
             print_triplets(random, cout);
             double goal = goal_solution(random, 15);
             cout << "Goal solution: " << goal << endl;
+            generate_next_working_point(data);
+            cout << "Given numbers:" << endl;
+            print(data, cout);
 
         }else {
             cout << "Loaded data is not valid. " << endl;
