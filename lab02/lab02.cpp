@@ -21,13 +21,18 @@ vector<int> load(string path){
     return data;
 }
 
-double goal_solution(vector<vector<int>> triplets, int desired_sum){
+double goal_solution(vector<vector<int>> triplets){
     double sum = 0;
+    
     int triplets_amount = triplets.size();
     vector<double> triplets_sums;
     for(auto x: triplets){
         double triplet_sum = accumulate(x.begin(), x.end(), 0.0);
         triplets_sums.push_back(triplet_sum);
+    }
+    int first_triplet_sum = triplets_sums[0];
+    for(int z: triplets_sums){
+        sum += first_triplet_sum-z;
     }
     return sum;
 }
@@ -79,19 +84,20 @@ void print_triplets(vector<vector<int>> triplets, ostream &out){
 
 int main(int argc, char** argv) {
     if(argc == 1) {
-        vector<int> data = {1,2,3,4,5,6};
+        vector<int> data = {1,2,3,4,5,6,1,2,3,4,56,7};
         if(isValid(data)) {
             cout << "Given numbers:" << endl;
             print(data, cout);
             vector<vector<int>> random = generate_working_point(data);
-            cout << "Random triplets:" << endl;
+            cout << "Generated triplets:" << endl;
             print_triplets(random, cout);
-            double goal = goal_solution(random, 15);
+            double goal = goal_solution(random);
             cout << "Goal solution: " << goal << endl;
             generate_next_working_point(data, random);
-            cout << "Given numbers:" << endl;
+            cout << "Next working point:" << endl;
             print(data, cout);
             print_triplets(random, cout);
+            cout << "Goal solution: " << goal << endl;
         }else {
             cout << "Loaded data is not valid. " << endl;
         }
