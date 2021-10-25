@@ -7,9 +7,10 @@
 
 using namespace std;
 
-//Przykład: {1 2 5 6 7 9} -> {1, 5, 9}, {2, 6, 7} suma = 15
+//Przykład: {1 2 5 6 7 9} -> {1, 5, 9}, {2, 6, 7} suma obu tripletów = 15
 
 vector<int> load(string path){
+    //wczytywanie liczb z pliku, format: liczby całkowite rozdzielone dowolnym białym znakiem
     vector<int> data;
     ifstream file;
     file.open(path);
@@ -22,9 +23,9 @@ vector<int> load(string path){
 }
 
 double goal_solution(vector<vector<int>> triplets){
+    // funkcja celu, sumujemy różnicę sum poszczególnych tripletów z sumą pierwszego
+    // cel jest osiągnięty jeżeli suma wynosi 0
     double sum = 0;
-    
-    int triplets_amount = triplets.size();
     vector<double> triplets_sums;
     for(auto x: triplets){
         double triplet_sum = accumulate(x.begin(), x.end(), 0.0);
@@ -39,22 +40,23 @@ double goal_solution(vector<vector<int>> triplets){
 
 
 void print(vector<int> data, ostream &out){
+        // wypisywanie zestawu dostepnych liczb i możliwość przekierowania outputu do pliku
         out << "{ ";
         for (int x: data) out << x << " ";
         out << "}" << endl;
 }
 
 bool isValid(vector<int> data){
+    // sprawdzenie czy przyjęto odpowiednią ilość liczb do budowy tripletów
     if(data.size()%3==0 && data.size()>=3) {
         return true;
-    }else if(data.size()%3!=0) {
-        return false;
     }else {
         return false;
     }
 }
 
 vector<vector<int>> generate_working_point(vector<int> input){
+    // funkcja generuje wektor zawierający triplety z podanego zbioru liczb
     vector<int> numbers = input;
     int v_size = numbers.size();
     int iterator = 0;
@@ -71,11 +73,13 @@ vector<vector<int>> generate_working_point(vector<int> input){
 }
 
 void generate_next_working_point(vector<int> &numbers, vector<vector<int>> &working_point){
+    // funkcja permutuje listę wszystkich liczb, a następnie na jej podstawie buduje nowe triplety
    next_permutation(numbers.begin(), numbers.end());
    working_point = generate_working_point(numbers);
 }
 
 void print_triplets(vector<vector<int>> triplets, ostream &out){
+    // 'ładne' wypisywanie wygenerowanych tripletów i możliwość przekierowania outputu do pliku
     for (vector<int> x: triplets) print(x, out);
 }
 
@@ -83,8 +87,8 @@ void print_triplets(vector<vector<int>> triplets, ostream &out){
 
 
 int main(int argc, char** argv) {
-    if(argc == 1) {
-        vector<int> data = {1,2,3,4,5,6,1,2,3,4,56,7};
+    if(argc > 1) {
+        vector<int> data =  load( argv[1] );;
         if(isValid(data)) {
             cout << "Given numbers:" << endl;
             print(data, cout);
