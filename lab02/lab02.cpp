@@ -95,12 +95,19 @@ void brute_force(vector<int> &numbers, vector<vector<int>> &working_point, ostre
     }while(starting_point!=numbers);
 }
 
-
+vector<int> generate_number_set(int amount){
+    vector<int> numbers;
+    srand( time(NULL) );
+    for(int i=0 ; i<amount; i++){
+        numbers.push_back(rand() % 10);
+    }
+    return numbers;
+}
 
 
 int main(int argc, char** argv) {
     if(argc > 1) {
-        vector<int> data =  load( argv[1] );
+        vector<int> data = load( argv[1] );
         if(isValid(data)) {
             cout << "Given numbers:" << endl;
             print(data, cout);
