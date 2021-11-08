@@ -40,10 +40,10 @@ double goal_solution(vector<vector<int>> triplets){
 
 
 void print(vector<int> data, ostream &out){
-        // wypisywanie zestawu dostepnych liczb i możliwość przekierowania outputu do pliku
-        out << "{ ";
-        for (int x: data) out << x << " ";
-        out << "}" << endl;
+    // wypisywanie zestawu dostepnych liczb i możliwość przekierowania outputu do pliku
+    out << "{ ";
+    for (int x: data) out << x << " ";
+    out << "}" << endl;
 }
 
 bool isValid(vector<int> data){
@@ -74,13 +74,25 @@ vector<vector<int>> generate_working_point(vector<int> input){
 
 void generate_next_working_point(vector<int> &numbers, vector<vector<int>> &working_point){
     // funkcja permutuje listę wszystkich liczb, a następnie na jej podstawie buduje nowe triplety
-   next_permutation(numbers.begin(), numbers.end());
-   working_point = generate_working_point(numbers);
+    next_permutation(numbers.begin(), numbers.end());
+    working_point = generate_working_point(numbers);
 }
 
 void print_triplets(vector<vector<int>> triplets, ostream &out){
     // 'ładne' wypisywanie wygenerowanych tripletów i możliwość przekierowania outputu do pliku
+    out << endl;
     for (vector<int> x: triplets) print(x, out);
+}
+
+void brute_force(vector<int> &numbers, vector<vector<int>> &working_point, ostream &out){
+    vector<int> starting_point = numbers;
+    do{
+        generate_next_working_point(numbers,working_point);
+        print_triplets(working_point, out);
+        if(goal_solution(working_point)==0){
+            out<<"^ znaleziono rozwiazanie!"<<endl;
+        }
+    }while(starting_point!=numbers);
 }
 
 
@@ -88,7 +100,7 @@ void print_triplets(vector<vector<int>> triplets, ostream &out){
 
 int main(int argc, char** argv) {
     if(argc > 1) {
-        vector<int> data =  load( argv[1] );;
+        vector<int> data =  load( argv[1] );
         if(isValid(data)) {
             cout << "Given numbers:" << endl;
             print(data, cout);
@@ -102,6 +114,7 @@ int main(int argc, char** argv) {
             print(data, cout);
             print_triplets(random, cout);
             cout << "Goal solution: " << goal << endl;
+            brute_force(data, random, cout);
         }else {
             cout << "Loaded data is not valid. " << endl;
         }
