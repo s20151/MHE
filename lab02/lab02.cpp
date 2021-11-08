@@ -33,7 +33,7 @@ double goal_solution(vector<vector<int>> triplets){
     }
     int first_triplet_sum = triplets_sums[0];
     for(int z: triplets_sums){
-        sum += first_triplet_sum-z;
+        sum += abs(first_triplet_sum-z);
     }
     return sum;
 }
@@ -43,7 +43,7 @@ void print(vector<int> data, ostream &out){
     // wypisywanie zestawu dostepnych liczb i możliwość przekierowania outputu do pliku
     out << "{ ";
     for (int x: data) out << x << " ";
-    out << "}" << endl;
+    out << "} ";
 }
 
 bool isValid(vector<int> data){
@@ -80,7 +80,6 @@ void generate_next_working_point(vector<int> &numbers, vector<vector<int>> &work
 
 void print_triplets(vector<vector<int>> triplets, ostream &out){
     // 'ładne' wypisywanie wygenerowanych tripletów i możliwość przekierowania outputu do pliku
-    out << endl;
     for (vector<int> x: triplets) print(x, out);
 }
 
@@ -90,8 +89,9 @@ void brute_force(vector<int> &numbers, vector<vector<int>> &working_point, ostre
         generate_next_working_point(numbers,working_point);
         print_triplets(working_point, out);
         if(goal_solution(working_point)==0){
-            out<<"^ znaleziono rozwiazanie!"<<endl;
+            out<<"<<< znaleziono rozwiazanie!";
         }
+        out<<endl;
     }while(starting_point!=numbers);
 }
 
@@ -107,7 +107,7 @@ vector<int> generate_number_set(int amount){
 
 int main(int argc, char** argv) {
     if(argc > 1) {
-        vector<int> data = load( argv[1] );
+        vector<int> data = generate_number_set(12);
         if(isValid(data)) {
             cout << "Given numbers:" << endl;
             print(data, cout);
