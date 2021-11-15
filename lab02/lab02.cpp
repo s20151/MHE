@@ -88,11 +88,28 @@ void brute_force(vector<int> &numbers, vector<vector<int>> &working_point, ostre
     do{
         generate_next_working_point(numbers,working_point);
         print_triplets(working_point, out);
+        out << " Goal value:" << goal_solution(working_point);
         if(goal_solution(working_point)==0){
             out<<"<<< znaleziono rozwiazanie!";
         }
         out<<endl;
     }while(starting_point!=numbers);
+}
+
+vector<vector<int>> hill_climb(int iterations, vector<int> &numbers, vector<vector<int>> &working_point, ostream &out){
+    auto best_point = working_point;
+    auto best_point_value = goal_solution(best_point);
+    for (int i = 0; i < iterations; i++) {
+        auto best_point_copy = best_point;
+        auto best_point_copy_value = goal_solution(best_point_copy);
+
+        //TODO OTOCZENIE
+
+        if (best_point_copy_value < best_point_value) {
+            best_point = best_point_copy;
+        }
+    }
+    return best_point;
 }
 
 vector<int> generate_number_set(int amount){
@@ -107,26 +124,21 @@ vector<int> generate_number_set(int amount){
 
 int main(int argc, char** argv) {
     if(argc > 1) {
-        vector<int> data = generate_number_set(12);
+        vector<int> data = load(argv[1]);
+//        vector<int> data = generate_number_set(12);
         if(isValid(data)) {
-            cout << "Given numbers:" << endl;
-            print(data, cout);
+            ofstream outfile (argv[2],ofstream::binary);
             vector<vector<int>> random = generate_working_point(data);
-            cout << "Generated triplets:" << endl;
-            print_triplets(random, cout);
-            double goal = goal_solution(random);
-            cout << "Goal solution: " << goal << endl;
-            generate_next_working_point(data, random);
-            cout << "Next working point:" << endl;
-            print(data, cout);
-            print_triplets(random, cout);
-            cout << "Goal solution: " << goal << endl;
-            brute_force(data, random, cout);
+            brute_force(data, random, outfile);
+            outfile.close();
+
+
         }else {
             cout << "Loaded data is not valid. " << endl;
         }
     }else {
         cout << "You did not enter file name."<<endl;
+
     }
     return 0;
 }
