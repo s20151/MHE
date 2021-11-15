@@ -90,10 +90,12 @@ void brute_force(vector<int> &numbers, vector<vector<int>> &working_point, ostre
         print_triplets(working_point, out);
         out << " Goal value:" << goal_solution(working_point);
         if(goal_solution(working_point)==0){
-            out<<"<<< znaleziono rozwiazanie!";
+            out<<" <<< solution";
+            return;
         }
         out<<endl;
     }while(starting_point!=numbers);
+    out<<"Unable to find solution in given set."<<endl;
 }
 
 vector<vector<int>> hill_climb(int iterations, vector<int> &numbers, vector<vector<int>> &working_point, ostream &out){
@@ -103,7 +105,7 @@ vector<vector<int>> hill_climb(int iterations, vector<int> &numbers, vector<vect
         auto best_point_copy = best_point;
         auto best_point_copy_value = goal_solution(best_point_copy);
 
-        //TODO OTOCZENIE
+        // TODO OTOCZENIE
 
         if (best_point_copy_value < best_point_value) {
             best_point = best_point_copy;
@@ -125,20 +127,52 @@ vector<int> generate_number_set(int amount){
 int main(int argc, char** argv) {
     if(argc > 1) {
         vector<int> data = load(argv[1]);
-//        vector<int> data = generate_number_set(12);
         if(isValid(data)) {
             ofstream outfile (argv[2],ofstream::binary);
             vector<vector<int>> random = generate_working_point(data);
             brute_force(data, random, outfile);
             outfile.close();
-
-
         }else {
             cout << "Loaded data is not valid. " << endl;
         }
     }else {
         cout << "You did not enter file name."<<endl;
-
+        cout << "Enter 1 to generate set."<<endl<<"Enter 2 to enter your numbers."<<endl;
+        int choice;
+        do {
+            cin >> choice;
+        }while(choice != 1 && choice != 2);
+        if(choice == 1){
+            cout<<"Set size = '3 * n' Enter n"<<endl;
+            int size;
+            do{
+                cin >> size;
+            }while(size<3 && size%3!=0);
+            vector<int> numbers = generate_number_set(size);
+            cout<<"Given numbers: ";
+            print(numbers,cout);
+            cout<<endl<<"Brute force: "<<endl;
+            vector<vector<int>> starting_point = generate_working_point(numbers);
+            brute_force(numbers, starting_point, cout);
+        }else{
+            cout<<"Enter numbers amount (a multiple of three): ";
+            int amount;
+            do{
+                cin >> amount;
+            }while(amount%3!=0 && amount<3);
+            vector<int> numbers;
+            cout << "Enter "<<amount<< " numbers: "<<endl;
+            for(int i = 0; i < amount; i++){
+                int number;
+                cin >> number;
+                numbers.push_back(number);
+            }
+            cout<<"Given numbers: ";
+            print(numbers,cout);
+            cout<<endl<<"Brute force: "<<endl;
+            vector<vector<int>> starting_point = generate_working_point(numbers);
+            brute_force(numbers, starting_point, cout);
+        }
     }
     return 0;
 }
