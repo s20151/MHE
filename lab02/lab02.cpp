@@ -5,10 +5,73 @@
 #include <algorithm>
 #include <numeric>
 #include <random>
+#include <chrono>
+#include <set>
+#include <list>
+#include <functional>
 
 using namespace std;
 
 //Przykład: {1 2 5 6 7 9} -> {1, 5, 9}, {2, 6, 7} suma obu tripletów = 15
+
+
+auto tabu_search = [](
+        auto cost,
+        auto generate_first_point,
+        auto neighbours_f, /// current work point neighbours
+        int N,
+        int tabu_size,
+        std::function<void(int c, double dt)> on_statistics = [](int c, double dt) {}) {
+    using namespace std;
+    auto start = chrono::steady_clock::now();
+
+    auto best_p = generate_first_point();
+
+    set<vector<vector<int>>> taboo_set;
+    list<vector<vector<int>>> taboo_list;
+
+    auto is_in_taboo = [&](auto e) {
+        //if (taboo_set.count(e)) cerr << "tabu hit" << endl;
+        return taboo_set.count(e);
+    };
+    auto add_to_taboo = [&](auto e) {
+        taboo_set.insert(e);
+        taboo_list.push_back(e);
+    };
+    auto shrink_taboo = [&]() {
+        if (taboo_set.size() > tabu_size) {
+            taboo_set.erase(taboo_list.front());
+            taboo_list.pop_front();
+            cerr << "shrink list" << endl;
+        }
+    };
+
+    auto p = best_p; // current work point
+
+    for (int i = 0; i < N; i++) {
+        auto neighbours = neighbours_f(best_p);
+        neighbours.erase(std::remove_if(neighbours.begin(),
+                                        neighbours.end(),
+                                        [&](auto e) { return is_in_taboo(e); }),
+                         neighbours.end());
+        if (neighbours.size() == 0) break;
+        p = *max_element(neighbours.begin(), neighbours.end(), [&](auto a, auto b) {
+            return cost(a) > cost(b);
+        });
+        add_to_taboo(p);
+        const double cost_value = cost(p);
+        if (cost(p) < cost(best_p)) {
+            best_p = p;
+            cout << "# TL better:  " << cost(best_p) << endl;
+        }
+        shrink_taboo();
+    }
+    auto finish = chrono::steady_clock::now();
+    chrono::duration<double> duration = finish - start;
+    on_statistics(N, duration.count());
+    return best_p;
+};
+
 
 vector<int> load(string path){
     //wczytywanie liczb z pliku, format: liczby całkowite rozdzielone dowolnym białym znakiem
@@ -219,9 +282,19 @@ int main(int argc, char** argv) {
             vector<vector<int>> starting_point = generate_working_point(numbers);
             vector<vector<int>> p_c = starting_point;
             vector<vector<int>> p_c2 = starting_point;
+            vector<vector<int>> p_c3 = starting_point;
             brute_force(numbers, p_c, cout);
             hill_climb(20,p_c2,cout);
 
+            vector<vector<int>> tabu = tabu_search(
+                    goal_solution,
+                    [&]() { return p_c3; },
+                    generate_neighbours,
+                    20,
+                    p_c3.size(),
+                    [](int c, double dt) {
+                        cout << "# count TS: " << c << "; dt:  " << dt << endl;
+                    });
 
 
 
