@@ -83,36 +83,69 @@ void print_triplets(vector<vector<int>> triplets, ostream &out){
     for (vector<int> x: triplets) print(x, out);
 }
 
-void brute_force(vector<int> &numbers, vector<vector<int>> &working_point, ostream &out){
+void brute_force(vector<int> numbers, vector<vector<int>> working_point, ostream &out){
+    clock_t start = clock();
     vector<int> starting_point = numbers;
     do{
         generate_next_working_point(numbers,working_point);
         print_triplets(working_point, out);
         out << " Goal value:" << goal_solution(working_point);
         if(goal_solution(working_point)==0){
-            out<<" <<< solution";
+            clock_t end = clock();
+            double elapsed = double(end - start) / CLOCKS_PER_SEC;
+            out<<" <<< solution"<<endl;
+            out<<"Brute force duration: "<<elapsed<<endl;
             return;
         }
         out<<endl;
     }while(starting_point!=numbers);
+    clock_t end = clock();
+    double elapsed = double(end - start) / CLOCKS_PER_SEC;
     out<<"Unable to find solution in given set."<<endl;
+    out<<"Brute force duration: "<<elapsed<<endl;
 }
 
-vector<vector<int>> hill_climb(int iterations, vector<int> &numbers, vector<vector<int>> &working_point, ostream &out){
-    auto best_point = working_point;
-    auto best_point_value = goal_solution(best_point);
-    for (int i = 0; i < iterations; i++) {
-        auto best_point_copy = best_point;
-        auto best_point_copy_value = goal_solution(best_point_copy);
+vector<vector<vector<int>>> generate_neighbours(vector<vector<int>> working_point){
+    vector<vector<vector<int>>> neighbours;
 
-        // TODO OTOCZENIE
-
-        if (best_point_copy_value < best_point_value) {
-            best_point = best_point_copy;
+    for(int i = 1; i<working_point.size(); i++){
+        for(int a = 0; a<3; a++){
+            for(int b = 0; b<3; b++){
+                auto current_neighbour = working_point;
+                swap(current_neighbour[0][a],current_neighbour[i][b]);
+                neighbours.push_back(current_neighbour);
+            }
         }
     }
+
+    return neighbours;
+}
+
+vector<vector<int>> hill_climb(int iterations, const vector<vector<int>> working_point, ostream &out){
+    clock_t start = clock();
+    auto best_point = working_point;
+    for (int i = 0; i < iterations; i++) {
+        out<<i<<endl;
+        auto best_point_copy = best_point;
+        auto neighbours = generate_neighbours(best_point_copy);
+        for(auto neighbour : neighbours){
+            out<<"X";
+            if (goal_solution(neighbour) < goal_solution(best_point)) {
+                best_point = neighbour;
+            }
+        }
+        if (best_point == best_point_copy) {
+            break;
+        }
+    }
+    clock_t end = clock();
+    double elapsed = double(end - start) / CLOCKS_PER_SEC;
+    print_triplets(best_point, out);
+    out<<endl<<"Goal value: "<<goal_solution(best_point);
+    out<<endl<<"Hill climb duration: "<<elapsed<<endl;
     return best_point;
 }
+
 
 vector<int> generate_number_set(int amount){
     vector<int> numbers;
@@ -129,8 +162,9 @@ int main(int argc, char** argv) {
         vector<int> data = load(argv[1]);
         if(isValid(data)) {
             ofstream outfile (argv[2],ofstream::binary);
-            vector<vector<int>> random = generate_working_point(data);
-            brute_force(data, random, outfile);
+            vector<vector<int>> wrk_pnt = generate_working_point(data);
+            brute_force(data, wrk_pnt, outfile);
+            hill_climb(20,wrk_pnt,outfile);
             outfile.close();
         }else {
             cout << "Loaded data is not valid. " << endl;
@@ -147,13 +181,20 @@ int main(int argc, char** argv) {
             int size;
             do{
                 cin >> size;
-            }while(size<3 && size%3!=0);
+            }while(size%3!=0);
             vector<int> numbers = generate_number_set(size);
             cout<<"Given numbers: ";
             print(numbers,cout);
             cout<<endl<<"Brute force: "<<endl;
             vector<vector<int>> starting_point = generate_working_point(numbers);
-            brute_force(numbers, starting_point, cout);
+            vector<vector<int>> p_c = starting_point;
+            vector<vector<int>> p_c2 = starting_point;
+            brute_force(numbers, p_c, cout);
+            hill_climb(20,p_c2,cout);
+
+
+
+
         }else{
             cout<<"Enter numbers amount (a multiple of three): ";
             int amount;
@@ -161,7 +202,7 @@ int main(int argc, char** argv) {
                 cin >> amount;
             }while(amount%3!=0 && amount<3);
             vector<int> numbers;
-            cout << "Enter "<<amount<< " numbers: "<<endl;
+            cout <<"Enter "<<amount<< " numbers: "<<endl;
             for(int i = 0; i < amount; i++){
                 int number;
                 cin >> number;
@@ -171,7 +212,9 @@ int main(int argc, char** argv) {
             print(numbers,cout);
             cout<<endl<<"Brute force: "<<endl;
             vector<vector<int>> starting_point = generate_working_point(numbers);
-            brute_force(numbers, starting_point, cout);
+            brute_force(numbers,starting_point,cout);
+            hill_climb(20,starting_point,cout);
+
         }
     }
     return 0;
