@@ -4,6 +4,7 @@
 #include <iostream>
 #include <algorithm>
 #include <numeric>
+#include <random>
 
 using namespace std;
 
@@ -125,11 +126,9 @@ vector<vector<int>> hill_climb(int iterations, const vector<vector<int>> working
     clock_t start = clock();
     auto best_point = working_point;
     for (int i = 0; i < iterations; i++) {
-        out<<i<<endl;
         auto best_point_copy = best_point;
         auto neighbours = generate_neighbours(best_point_copy);
         for(auto neighbour : neighbours){
-            out<<"X";
             if (goal_solution(neighbour) < goal_solution(best_point)) {
                 best_point = neighbour;
             }
@@ -140,9 +139,39 @@ vector<vector<int>> hill_climb(int iterations, const vector<vector<int>> working
     }
     clock_t end = clock();
     double elapsed = double(end - start) / CLOCKS_PER_SEC;
+    out<<"Hill climb result: ";
     print_triplets(best_point, out);
     out<<endl<<"Goal value: "<<goal_solution(best_point);
     out<<endl<<"Hill climb duration: "<<elapsed<<endl;
+    return best_point;
+}
+
+vector<vector<int>> hill_climb_stochastic(int iterations, const vector<vector<int>> working_point, ostream &out){
+    std::random_device dev;
+    std::mt19937 rng(dev());
+    clock_t start = clock();
+    auto best_point = working_point;
+    for (int i = 0; i < iterations; i++) {
+        auto best_point_copy = best_point;
+        auto neighbours = generate_neighbours(best_point_copy);
+        uniform_int_distribution<> distrib(0, neighbours.size() - 1);
+        for(int i=0; i<neighbours.size(); i++) {
+            int random_number = distrib(rng);
+            auto neighbour = neighbours[random_number];
+            if (goal_solution(neighbour) < goal_solution(best_point)) {
+                best_point = neighbour;
+            }
+        }
+        if (best_point == best_point_copy) {
+            break;
+        }
+    }
+    clock_t end = clock();
+    double elapsed = double(end - start) / CLOCKS_PER_SEC;
+    out<<"stochastic Hill climb result: ";
+    print_triplets(best_point, out);
+    out<<endl<<"Goal value: "<<goal_solution(best_point);
+    out<<endl<<"stochastic Hill climb duration: "<<elapsed<<endl;
     return best_point;
 }
 
@@ -165,6 +194,7 @@ int main(int argc, char** argv) {
             vector<vector<int>> wrk_pnt = generate_working_point(data);
             brute_force(data, wrk_pnt, outfile);
             hill_climb(20,wrk_pnt,outfile);
+            hill_climb_stochastic(20,wrk_pnt,outfile);
             outfile.close();
         }else {
             cout << "Loaded data is not valid. " << endl;
