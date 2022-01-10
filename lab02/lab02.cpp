@@ -42,7 +42,6 @@ auto tabu_search = [](
         if (taboo_set.size() > tabu_size) {
             taboo_set.erase(taboo_list.front());
             taboo_list.pop_front();
-            cerr << "shrink list" << endl;
         }
     };
 
@@ -73,12 +72,12 @@ auto tabu_search = [](
 };
 
 
-vector<int> load(string path){
+vector<int> load(string path) {
     //wczytywanie liczb z pliku, format: liczby całkowite rozdzielone dowolnym białym znakiem
     vector<int> data;
     ifstream file;
     file.open(path);
-    if(file){
+    if (file) {
         int number;
         while (file >> number) data.push_back(number);
     }
@@ -86,48 +85,48 @@ vector<int> load(string path){
     return data;
 }
 
-double goal_solution(vector<vector<int>> triplets){
+double goal_solution(vector<vector<int>> triplets) {
     // funkcja celu, sumujemy różnicę sum poszczególnych tripletów z sumą pierwszego
     // cel jest osiągnięty jeżeli suma wynosi 0
     double sum = 0;
     vector<double> triplets_sums;
-    for(auto x: triplets){
+    for (auto x: triplets) {
         double triplet_sum = accumulate(x.begin(), x.end(), 0.0);
         triplets_sums.push_back(triplet_sum);
     }
     int first_triplet_sum = triplets_sums[0];
-    for(int z: triplets_sums){
-        sum += abs(first_triplet_sum-z);
+    for (int z: triplets_sums) {
+        sum += abs(first_triplet_sum - z);
     }
     return sum;
 }
 
 
-void print(vector<int> data, ostream &out){
+void print(vector<int> data, ostream &out) {
     // wypisywanie zestawu dostepnych liczb i możliwość przekierowania outputu do pliku
     out << "{ ";
     for (int x: data) out << x << " ";
     out << "} ";
 }
 
-bool isValid(vector<int> data){
+bool isValid(vector<int> data) {
     // sprawdzenie czy przyjęto odpowiednią ilość liczb do budowy tripletów
-    if(data.size()%3==0 && data.size()>=3) {
+    if (data.size() % 3 == 0 && data.size() >= 3) {
         return true;
-    }else {
+    } else {
         return false;
     }
 }
 
-vector<vector<int>> generate_working_point(vector<int> input){
+vector<vector<int>> generate_working_point(vector<int> input) {
     // funkcja generuje wektor zawierający triplety z podanego zbioru liczb
     vector<int> numbers = input;
     int v_size = numbers.size();
     int iterator = 0;
     vector<vector<int>> triplets;
-    for(int i=0; i<v_size/3; i++){
+    for (int i = 0; i < v_size / 3; i++) {
         vector<int> triplet;
-        for(int j=0; j<3; j++){
+        for (int j = 0; j < 3; j++) {
             triplet.push_back(numbers[iterator]);
             iterator++;
         }
@@ -136,47 +135,46 @@ vector<vector<int>> generate_working_point(vector<int> input){
     return triplets;
 }
 
-void generate_next_working_point(vector<int> &numbers, vector<vector<int>> &working_point){
+void generate_next_working_point(vector<int> &numbers, vector<vector<int>> &working_point) {
     // funkcja permutuje listę wszystkich liczb, a następnie na jej podstawie buduje nowe triplety
     next_permutation(numbers.begin(), numbers.end());
     working_point = generate_working_point(numbers);
 }
 
-void print_triplets(vector<vector<int>> triplets, ostream &out){
+void print_triplets(vector<vector<int>> triplets, ostream &out) {
     // 'ładne' wypisywanie wygenerowanych tripletów i możliwość przekierowania outputu do pliku
     for (vector<int> x: triplets) print(x, out);
 }
 
-void brute_force(vector<int> numbers, vector<vector<int>> working_point, ostream &out){
+void brute_force(vector<int> numbers, vector<vector<int>> working_point, ostream &out) {
     auto start = chrono::steady_clock::now();
     vector<int> starting_point = numbers;
-    do{
-        generate_next_working_point(numbers,working_point);
-        print_triplets(working_point, out);
-        out << " Goal value:" << goal_solution(working_point);
-        if(goal_solution(working_point)==0){
+    do {
+        generate_next_working_point(numbers, working_point);
+        if (goal_solution(working_point) == 0) {
             auto finish = chrono::steady_clock::now();
             chrono::duration<double> duration = finish - start;
-            out<<" <<< solution"<<endl;
-            out<<"Brute force duration: "<< duration.count()<<endl;
+            out << "Brute force duration: " << duration.count() << " Problem size: " << numbers.size() <<
+                " Goal value: " << goal_solution(working_point) << endl;
+            cout<< "Brute force duration: " << duration.count() << " Problem size: " << numbers.size() <<
+                                              " Goal value: " << goal_solution(working_point) << endl;
             return;
         }
-        out<<endl;
-    }while(starting_point!=numbers);
+    } while (starting_point != numbers);
     auto finish = chrono::steady_clock::now();
     chrono::duration<double> duration = finish - start;
-    out<<"Unable to find solution in given set."<<endl;
-    out<<"Brute force duration: " << duration.count()<<endl;
+    out << "Unable to find solution in given set." << endl;
+    out << "Brute force duration: " << duration.count() << endl;
 }
 
-vector<vector<vector<int>>> generate_neighbours(vector<vector<int>> working_point){
+vector<vector<vector<int>>> generate_neighbours(vector<vector<int>> working_point) {
     vector<vector<vector<int>>> neighbours;
 
-    for(int i = 1; i<working_point.size(); i++){
-        for(int a = 0; a<3; a++){
-            for(int b = 0; b<3; b++){
+    for (int i = 1; i < working_point.size(); i++) {
+        for (int a = 0; a < 3; a++) {
+            for (int b = 0; b < 3; b++) {
                 auto current_neighbour = working_point;
-                swap(current_neighbour[0][a],current_neighbour[i][b]);
+                swap(current_neighbour[0][a], current_neighbour[i][b]);
                 neighbours.push_back(current_neighbour);
             }
         }
@@ -185,13 +183,13 @@ vector<vector<vector<int>>> generate_neighbours(vector<vector<int>> working_poin
     return neighbours;
 }
 
-vector<vector<int>> hill_climb(int iterations, const vector<vector<int>> working_point, ostream &out){
+vector<vector<int>> hill_climb(int iterations, const vector<vector<int>> working_point, ostream &out) {
     auto start = chrono::steady_clock::now();
     auto best_point = working_point;
     for (int i = 0; i < iterations; i++) {
         auto best_point_copy = best_point;
         auto neighbours = generate_neighbours(best_point_copy);
-        for(auto neighbour : neighbours){
+        for (auto neighbour : neighbours) {
             if (goal_solution(neighbour) < goal_solution(best_point)) {
                 best_point = neighbour;
             }
@@ -202,14 +200,14 @@ vector<vector<int>> hill_climb(int iterations, const vector<vector<int>> working
     }
     auto finish = chrono::steady_clock::now();
     chrono::duration<double> duration = finish - start;
-    out<<"Hill climb result: ";
+    out << "Hill climb result: ";
     print_triplets(best_point, out);
-    out<<endl<<"Goal value: "<<goal_solution(best_point);
-    out<<endl<<"Hill climb duration: "<< duration.count()<<endl;
+    out << endl << "Goal value: " << goal_solution(best_point);
+    out << endl << "Hill climb duration: " << duration.count() << endl;
     return best_point;
 }
 
-vector<vector<int>> hill_climb_stochastic(int iterations, const vector<vector<int>> working_point, ostream &out){
+vector<vector<int>> hill_climb_stochastic(int iterations, const vector<vector<int>> working_point, ostream &out) {
     std::random_device dev;
     std::mt19937 rng(dev());
     auto start = chrono::steady_clock::now();
@@ -218,7 +216,7 @@ vector<vector<int>> hill_climb_stochastic(int iterations, const vector<vector<in
         auto best_point_copy = best_point;
         auto neighbours = generate_neighbours(best_point_copy);
         uniform_int_distribution<> distrib(0, neighbours.size() - 1);
-        for(int i=0; i<neighbours.size(); i++) {
+        for (int i = 0; i < neighbours.size(); i++) {
             int random_number = distrib(rng);
             auto neighbour = neighbours[random_number];
             if (goal_solution(neighbour) < goal_solution(best_point)) {
@@ -231,72 +229,71 @@ vector<vector<int>> hill_climb_stochastic(int iterations, const vector<vector<in
     }
     auto finish = chrono::steady_clock::now();
     chrono::duration<double> duration = finish - start;
-    out<<"stochastic Hill climb result: ";
+    out << "stochastic Hill climb result: ";
     print_triplets(best_point, out);
-    out<<endl<<"Goal value: "<<goal_solution(best_point);
-    out<<endl<<"stochastic Hill climb duration: "<<duration.count()<<endl;
+    out << endl << "Goal value: " << goal_solution(best_point);
+    out << endl << "stochastic Hill climb duration: " << duration.count() << endl;
     return best_point;
 }
 
 
-vector<int> generate_number_set(int amount){
+vector<int> generate_number_set(int amount) {
     vector<int> numbers;
-    srand( time(NULL) );
-    for(int i=0 ; i<amount; i++){
+    srand(time(NULL));
+    for (int i = 0; i < amount; i++) {
         numbers.push_back(rand() % 10);
     }
     return numbers;
 }
 
 
-int main(int argc, char** argv) {
-    if(argc > 1) {
+int main(int argc, char **argv) {
+    if (argc > 1) {
         vector<int> data = load(argv[1]);
-        if(isValid(data)) {
-            ofstream outfile (argv[2],ofstream::binary);
+        if (isValid(data)) {
+            ofstream outfile(argv[2], ios_base::app);
             vector<vector<int>> wrk_pnt = generate_working_point(data);
-            brute_force(data, wrk_pnt, outfile);
+//            brute_force(data, wrk_pnt, outfile);
             hill_climb(20,wrk_pnt,outfile);
-            hill_climb_stochastic(20,wrk_pnt,outfile);
-            vector<vector<int>> tabu = tabu_search(
-                    goal_solution,
-                    [&]() { return wrk_pnt; },
-                    generate_neighbours,
-                    20,
-                    wrk_pnt.size(),
-                    [](int c, double dt) {
-                        cout << "# count TS: " << c <<endl <<"Tabu search duration: "<< dt << endl;
-                    });
-            outfile<<"Tabu result: ";
-            print_triplets(tabu,outfile);
+//            hill_climb_stochastic(20,wrk_pnt,outfile);
+//            double taboo_time = 0;
+//            vector<vector<int>> tabu = tabu_search(
+//                    goal_solution,
+//                    [&]() { return wrk_pnt; },
+//                    generate_neighbours,
+//                    20,
+//                    wrk_pnt.size(),
+//                    [](int c, double dt) {
+//                        cout << "# count TS: " << c <<endl <<"Tabu search duration: "<< dt << endl;
+//                    });
             outfile.close();
-        }else {
+        } else {
             cout << "Loaded data is not valid. " << endl;
         }
-    }else {
-        cout << "You did not enter file name."<<endl;
-        cout << "Enter 1 to generate set."<<endl<<"Enter 2 to enter your numbers."<<endl;
+    } else {
+        cout << "You did not enter file name." << endl;
+        cout << "Enter 1 to generate set." << endl << "Enter 2 to enter your numbers." << endl;
         int choice;
         do {
             cin >> choice;
-        }while(choice != 1 && choice != 2);
-        if(choice == 1){
-            cout<<"Set size = '3 * n' Enter n"<<endl;
+        } while (choice != 1 && choice != 2);
+        if (choice == 1) {
+            cout << "Set size = '3 * n' Enter n" << endl;
             int size;
-            do{
+            do {
                 cin >> size;
-            }while(size%3!=0);
+            } while (size % 3 != 0);
             vector<int> numbers = generate_number_set(size);
-            cout<<"Given numbers: ";
-            print(numbers,cout);
-            cout<<endl<<"Brute force: "<<endl;
+            cout << "Given numbers: ";
+            print(numbers, cout);
+            cout << endl << "Brute force: " << endl;
             vector<vector<int>> starting_point = generate_working_point(numbers);
             vector<vector<int>> p_c = starting_point;
             vector<vector<int>> p_c2 = starting_point;
             vector<vector<int>> p_c3 = starting_point;
             brute_force(numbers, p_c, cout);
-            hill_climb(20,p_c2,cout);
-            hill_climb_stochastic(20,p_c2,cout);
+            hill_climb(20, p_c2, cout);
+            hill_climb_stochastic(20, p_c2, cout);
             vector<vector<int>> tabu = tabu_search(
                     goal_solution,
                     [&]() { return p_c3; },
@@ -304,32 +301,32 @@ int main(int argc, char** argv) {
                     20,
                     p_c3.size(),
                     [](int c, double dt) {
-                        cout << "# count TS: " << c <<endl <<"Tabu search duration: "<< dt << endl;
+                        cout << "# count TS: " << c << endl << "Tabu search duration: " << dt << endl;
                     });
-            cout<<"Tabu result: ";
-            print_triplets(tabu,cout);
+            cout << "Tabu result: ";
+            print_triplets(tabu, cout);
 
 
-        }else{
-            cout<<"Enter numbers amount (a multiple of three): ";
+        } else {
+            cout << "Enter numbers amount (a multiple of three): ";
             int amount;
-            do{
+            do {
                 cin >> amount;
-            }while(amount%3!=0 && amount<3);
+            } while (amount % 3 != 0 && amount < 3);
             vector<int> numbers;
-            cout <<"Enter "<<amount<< " numbers: "<<endl;
-            for(int i = 0; i < amount; i++){
+            cout << "Enter " << amount << " numbers: " << endl;
+            for (int i = 0; i < amount; i++) {
                 int number;
                 cin >> number;
                 numbers.push_back(number);
             }
-            cout<<"Given numbers: ";
-            print(numbers,cout);
-            cout<<endl<<"Brute force: "<<endl;
+            cout << "Given numbers: ";
+            print(numbers, cout);
+            cout << endl << "Brute force: " << endl;
             vector<vector<int>> starting_point = generate_working_point(numbers);
-            brute_force(numbers,starting_point,cout);
-            hill_climb(20,starting_point,cout);
-            hill_climb_stochastic(20,starting_point,cout);
+            brute_force(numbers, starting_point, cout);
+            hill_climb(20, starting_point, cout);
+            hill_climb_stochastic(20, starting_point, cout);
             vector<vector<int>> tabu = tabu_search(
                     goal_solution,
                     [&]() { return starting_point; },
@@ -337,10 +334,10 @@ int main(int argc, char** argv) {
                     20,
                     starting_point.size(),
                     [](int c, double dt) {
-                        cout << "# count TS: " << c <<endl <<"Tabu search duration: "<< dt << endl;
+                        cout << "# count TS: " << c << endl << "Tabu search duration: " << dt << endl;
                     });
-            cout<<"Tabu result: ";
-            print_triplets(tabu,cout);
+            cout << "Tabu result: ";
+            print_triplets(tabu, cout);
         }
     }
     return 0;
