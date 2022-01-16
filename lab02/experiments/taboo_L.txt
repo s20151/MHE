@@ -1,0 +1,26 @@
+Taboo search duration: ;0.0054477; Problem size: ;12; Goal value: ;32
+Taboo search duration: ;0.0052794; Problem size: ;12; Goal value: ;26
+Taboo search duration: ;0.0048264; Problem size: ;12; Goal value: ;20
+Taboo search duration: ;0.0047865; Problem size: ;12; Goal value: ;28
+Taboo search duration: ;0.0048891; Problem size: ;12; Goal value: ;18
+Taboo search duration: ;0.0053413; Problem size: ;12; Goal value: ;22
+Taboo search duration: ;0.005441; Problem size: ;12; Goal value: ;8
+Taboo search duration: ;0.0048412; Problem size: ;12; Goal value: ;20
+Taboo search duration: ;0.0047077; Problem size: ;12; Goal value: ;14
+Taboo search duration: ;0.0046873; Problem size: ;12; Goal value: ;18
+Taboo search duration: ;0.0048403; Problem size: ;12; Goal value: ;6
+Taboo search duration: ;0.0048436; Problem size: ;12; Goal value: ;26
+Taboo search duration: ;0.0047815; Problem size: ;12; Goal value: ;8
+Taboo search duration: ;0.0047535; Problem size: ;12; Goal value: ;16
+Taboo search duration: ;0.0049644; Problem size: ;12; Goal value: ;18
+Taboo search duration: ;0.0048454; Problem size: ;12; Goal value: ;12
+Taboo search duration: ;0.0047524; Problem size: ;12; Goal value: ;20
+Taboo search duration: ;0.0052226; Problem size: ;12; Goal value: ;18
+Taboo search duration: ;0.0048382; Problem size: ;12; Goal value: ;8
+Taboo search duration: ;0.0048326; Problem size: ;12; Goal value: ;10
+Taboo search duration: ;0.0048371; Problem size: ;12; Goal value: ;22
+Taboo search duration: ;0.004813; Problem size: ;12; Goal value: ;10
+Taboo search duration: ;0.0048672; Problem size: ;12; Goal value: ;24
+Taboo search duration: ;0.0049087; Problem size: ;12; Goal value: ;10
+Taboo search duration: ;0.0048987; Problem size: ;12; Goal value: ;12
+

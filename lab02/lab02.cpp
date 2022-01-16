@@ -97,8 +97,8 @@ auto tabu_search = [](
     }
     auto finish = chrono::steady_clock::now();
     chrono::duration<double> duration = finish - start;
-    cout << "Taboo search duration: " << duration.count() << " Problem size: " << 12 <<
-        " Goal value: " << goal_solution(best_p) << endl;
+    cout << "Taboo search duration: ;" << duration.count() << "; Problem size: ;" << 12 <<
+        "; Goal value: ;" << goal_solution(best_p) << endl;
     return best_p;
 };
 
@@ -158,15 +158,15 @@ void brute_force(vector<int> numbers, vector<vector<int>> working_point, ostream
         if (goal_solution(working_point) == 0) {
             auto finish = chrono::steady_clock::now();
             chrono::duration<double> duration = finish - start;
-            out << "Brute force duration: " << duration.count() << " Problem size: " << numbers.size() <<
-                " Goal value: " << goal_solution(working_point) << endl;
+            out << "Brute force duration: ;" << duration.count() << "; Problem size: ;" << numbers.size() <<
+                "; Goal value: ;" << goal_solution(working_point) << endl;
             return;
         }
     } while (starting_point != numbers);
     auto finish = chrono::steady_clock::now();
     chrono::duration<double> duration = finish - start;
-    out << "Brute force duration: " << duration.count() << " Problem size: " << numbers.size() <<
-        " Goal value: " << goal_solution(working_point) << endl;
+    out << "Brute force duration: ;" << duration.count() << "; Problem size: ;" << numbers.size() <<
+        "; Goal value: ;" << goal_solution(working_point) << endl;
 }
 
 vector<vector<vector<int>>> generate_neighbours(vector<vector<int>> working_point) {
@@ -202,8 +202,8 @@ vector<vector<int>> hill_climb(int iterations, const vector<vector<int>> working
     }
     auto finish = chrono::steady_clock::now();
     chrono::duration<double> duration = finish - start;
-    out << "Hill climb duration: " << duration.count() << " Problem size: " << 6 <<
-        " Goal value: " << goal_solution(best_point) << endl;
+    out << "Hill climb duration: ;" << duration.count() << "; Problem size: ;" << 12 <<
+        "; Goal value: ;" << goal_solution(best_point) << endl;
     return best_point;
 }
 
@@ -254,16 +254,7 @@ int main(int argc, char **argv) {
             ofstream outfile(argv[2], ios_base::app);
             for(int i=0; i<25; i++) {
                 vector<vector<int>> wrk_pnt = generate_working_point(data);
-                double taboo_time = 0;
-                vector<vector<int>> tabu = tabu_search(
-                        goal_solution,
-                        [&]() { return wrk_pnt; },
-                        generate_neighbours,
-                        20,
-                        wrk_pnt.size(),
-                        [](int c, double dt) {
-                            cout << "# count TS: " << c <<endl <<"Tabu search duration: "<< dt << endl;
-                        });
+                brute_force(data, wrk_pnt, outfile);
             }
             outfile.close();
         } else {
