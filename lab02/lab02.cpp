@@ -17,6 +17,36 @@ using namespace std;
 //Przykład: {1 2 5 6 7 9} -> {1, 5, 9}, {2, 6, 7} suma obu tripletów = 15
 
 
+vector<int> load(string path) {
+    //wczytywanie liczb z pliku, format: liczby całkowite rozdzielone dowolnym białym znakiem
+    vector<int> data;
+    ifstream file;
+    file.open(path);
+    if (file) {
+        int number;
+        while (file >> number) data.push_back(number);
+    }
+    file.close();
+    return data;
+}
+
+
+double goal_solution(vector<vector<int>> triplets) {
+    // funkcja celu, sumujemy różnicę sum poszczególnych tripletów z sumą pierwszego
+    // cel jest osiągnięty jeżeli suma wynosi 0
+    double sum = 0;
+    vector<double> triplets_sums;
+    for (auto x: triplets) {
+        double triplet_sum = accumulate(x.begin(), x.end(), 0.0);
+        triplets_sums.push_back(triplet_sum);
+    }
+    int first_triplet_sum = triplets_sums[0];
+    for (int z: triplets_sums) {
+        sum += abs(first_triplet_sum - z);
+    }
+    return sum;
+}
+
 auto tabu_search = [](
         auto cost,
         auto generate_first_point,
@@ -24,7 +54,6 @@ auto tabu_search = [](
         int N,
         int tabu_size,
         std::function<void(int c, double dt)> on_statistics = [](int c, double dt) {}) {
-    using namespace std;
     auto start = chrono::steady_clock::now();
 
     auto best_p = generate_first_point();
@@ -63,45 +92,15 @@ auto tabu_search = [](
         const double cost_value = cost(p);
         if (cost(p) < cost(best_p)) {
             best_p = p;
-            cout << "# TL better:  " << cost(best_p) << endl;
         }
         shrink_taboo();
     }
     auto finish = chrono::steady_clock::now();
     chrono::duration<double> duration = finish - start;
-    on_statistics(N, duration.count());
+    cout << "Taboo search duration: " << duration.count() << " Problem size: " << 12 <<
+        " Goal value: " << goal_solution(best_p) << endl;
     return best_p;
 };
-
-
-vector<int> load(string path) {
-    //wczytywanie liczb z pliku, format: liczby całkowite rozdzielone dowolnym białym znakiem
-    vector<int> data;
-    ifstream file;
-    file.open(path);
-    if (file) {
-        int number;
-        while (file >> number) data.push_back(number);
-    }
-    file.close();
-    return data;
-}
-
-double goal_solution(vector<vector<int>> triplets) {
-    // funkcja celu, sumujemy różnicę sum poszczególnych tripletów z sumą pierwszego
-    // cel jest osiągnięty jeżeli suma wynosi 0
-    double sum = 0;
-    vector<double> triplets_sums;
-    for (auto x: triplets) {
-        double triplet_sum = accumulate(x.begin(), x.end(), 0.0);
-        triplets_sums.push_back(triplet_sum);
-    }
-    int first_triplet_sum = triplets_sums[0];
-    for (int z: triplets_sums) {
-        sum += abs(first_triplet_sum - z);
-    }
-    return sum;
-}
 
 
 void print(vector<int> data, ostream &out) {
@@ -255,21 +254,18 @@ int main(int argc, char **argv) {
             ofstream outfile(argv[2], ios_base::app);
             for(int i=0; i<25; i++) {
                 vector<vector<int>> wrk_pnt = generate_working_point(data);
-                //  hill_climb(20, wrk_pnt, outfile);
-                brute_force(data, wrk_pnt, outfile);
+                double taboo_time = 0;
+                vector<vector<int>> tabu = tabu_search(
+                        goal_solution,
+                        [&]() { return wrk_pnt; },
+                        generate_neighbours,
+                        20,
+                        wrk_pnt.size(),
+                        [](int c, double dt) {
+                            cout << "# count TS: " << c <<endl <<"Tabu search duration: "<< dt << endl;
+                        });
             }
             outfile.close();
-//            hill_climb_stochastic(20,wrk_pnt,outfile);
-//            double taboo_time = 0;
-//            vector<vector<int>> tabu = tabu_search(
-//                    goal_solution,
-//                    [&]() { return wrk_pnt; },
-//                    generate_neighbours,
-//                    20,
-//                    wrk_pnt.size(),
-//                    [](int c, double dt) {
-//                        cout << "# count TS: " << c <<endl <<"Tabu search duration: "<< dt << endl;
-//                    });
         } else {
             cout << "Loaded data is not valid. " << endl;
         }
