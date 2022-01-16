@@ -12,6 +12,8 @@
 
 using namespace std;
 
+
+
 //Przykład: {1 2 5 6 7 9} -> {1, 5, 9}, {2, 6, 7} suma obu tripletów = 15
 
 
@@ -121,6 +123,9 @@ bool isValid(vector<int> data) {
 vector<vector<int>> generate_working_point(vector<int> input) {
     // funkcja generuje wektor zawierający triplety z podanego zbioru liczb
     vector<int> numbers = input;
+    std::random_device dev;
+    std::mt19937 rng(dev());
+    shuffle(begin(numbers), end(numbers), rng);
     int v_size = numbers.size();
     int iterator = 0;
     vector<vector<int>> triplets;
@@ -156,15 +161,13 @@ void brute_force(vector<int> numbers, vector<vector<int>> working_point, ostream
             chrono::duration<double> duration = finish - start;
             out << "Brute force duration: " << duration.count() << " Problem size: " << numbers.size() <<
                 " Goal value: " << goal_solution(working_point) << endl;
-            cout<< "Brute force duration: " << duration.count() << " Problem size: " << numbers.size() <<
-                                              " Goal value: " << goal_solution(working_point) << endl;
             return;
         }
     } while (starting_point != numbers);
     auto finish = chrono::steady_clock::now();
     chrono::duration<double> duration = finish - start;
-    out << "Unable to find solution in given set." << endl;
-    out << "Brute force duration: " << duration.count() << endl;
+    out << "Brute force duration: " << duration.count() << " Problem size: " << numbers.size() <<
+        " Goal value: " << goal_solution(working_point) << endl;
 }
 
 vector<vector<vector<int>>> generate_neighbours(vector<vector<int>> working_point) {
@@ -200,10 +203,8 @@ vector<vector<int>> hill_climb(int iterations, const vector<vector<int>> working
     }
     auto finish = chrono::steady_clock::now();
     chrono::duration<double> duration = finish - start;
-    out << "Hill climb result: ";
-    print_triplets(best_point, out);
-    out << endl << "Goal value: " << goal_solution(best_point);
-    out << endl << "Hill climb duration: " << duration.count() << endl;
+    out << "Hill climb duration: " << duration.count() << " Problem size: " << 6 <<
+        " Goal value: " << goal_solution(best_point) << endl;
     return best_point;
 }
 
@@ -252,9 +253,12 @@ int main(int argc, char **argv) {
         vector<int> data = load(argv[1]);
         if (isValid(data)) {
             ofstream outfile(argv[2], ios_base::app);
-            vector<vector<int>> wrk_pnt = generate_working_point(data);
-//            brute_force(data, wrk_pnt, outfile);
-            hill_climb(20,wrk_pnt,outfile);
+            for(int i=0; i<25; i++) {
+                vector<vector<int>> wrk_pnt = generate_working_point(data);
+                //  hill_climb(20, wrk_pnt, outfile);
+                brute_force(data, wrk_pnt, outfile);
+            }
+            outfile.close();
 //            hill_climb_stochastic(20,wrk_pnt,outfile);
 //            double taboo_time = 0;
 //            vector<vector<int>> tabu = tabu_search(
@@ -266,7 +270,6 @@ int main(int argc, char **argv) {
 //                    [](int c, double dt) {
 //                        cout << "# count TS: " << c <<endl <<"Tabu search duration: "<< dt << endl;
 //                    });
-            outfile.close();
         } else {
             cout << "Loaded data is not valid. " << endl;
         }
