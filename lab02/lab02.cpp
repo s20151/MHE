@@ -97,7 +97,7 @@ auto tabu_search = [](
     }
     auto finish = chrono::steady_clock::now();
     chrono::duration<double> duration = finish - start;
-    cout << "Taboo search duration: ;" << duration.count() << "; Problem size: ;" << 12 <<
+    cout << "Taboo search duration: ;" << duration.count() << "; Problem size: ;" << 6 <<
         "; Goal value: ;" << goal_solution(best_p) << endl;
     return best_p;
 };
@@ -202,7 +202,7 @@ vector<vector<int>> hill_climb(int iterations, const vector<vector<int>> working
     }
     auto finish = chrono::steady_clock::now();
     chrono::duration<double> duration = finish - start;
-    out << "Hill climb duration: ;" << duration.count() << "; Problem size: ;" << 12 <<
+    out << "Hill climb duration: ;" << duration.count() << "; Problem size: ;" << 24 <<
         "; Goal value: ;" << goal_solution(best_point) << endl;
     return best_point;
 }
@@ -245,6 +245,20 @@ vector<int> generate_number_set(int amount) {
     }
     return numbers;
 }
+
+
+//
+// Genetyczny:
+// 1. zaczynamy od losowej populacji losowej
+// 2. naturalna selekcja -> funkcja fitness jeżeli nie spełnia warunku fitness=0
+// 3. wybieramy 2 rodziców <selection>
+// 4. dzielimy ich genom i zamieniamy go <crossover>
+// 5. powtarzamy 3 i 4 do powstania nowej generacji
+// 6. przenosimy najlepsze rozwiazanie
+// 7. mutacje
+// 8. powtarzamy do znalezienia rozwiazania
+//
+
 
 
 int main(int argc, char **argv) {
