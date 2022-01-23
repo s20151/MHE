@@ -98,7 +98,7 @@ auto tabu_search = [](
     auto finish = chrono::steady_clock::now();
     chrono::duration<double> duration = finish - start;
     cout << "Taboo search duration: ;" << duration.count() << "; Problem size: ;" << 6 <<
-        "; Goal value: ;" << goal_solution(best_p) << endl;
+         "; Goal value: ;" << goal_solution(best_p) << endl;
     return best_p;
 };
 
@@ -191,7 +191,7 @@ vector<vector<int>> hill_climb(int iterations, const vector<vector<int>> working
     for (int i = 0; i < iterations; i++) {
         auto best_point_copy = best_point;
         auto neighbours = generate_neighbours(best_point_copy);
-        for (auto neighbour : neighbours) {
+        for (auto neighbour: neighbours) {
             if (goal_solution(neighbour) < goal_solution(best_point)) {
                 best_point = neighbour;
             }
@@ -266,7 +266,7 @@ int main(int argc, char **argv) {
         vector<int> data = load(argv[1]);
         if (isValid(data)) {
             ofstream outfile(argv[2], ios_base::app);
-            for(int i=0; i<25; i++) {
+            for (int i = 0; i < 25; i++) {
                 vector<vector<int>> wrk_pnt = generate_working_point(data);
                 brute_force(data, wrk_pnt, outfile);
             }

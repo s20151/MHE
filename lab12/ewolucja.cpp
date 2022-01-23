@@ -4,6 +4,7 @@
 #include <list>
 #include <random>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
@@ -39,25 +40,34 @@ vector<double> simulated_annealing(
     return p_best;
 }
 
-auto rastrigin_function_domain(int size){
-    vector<pair<double,double>> domain;
-    for(int i = 0; i < size; i++){
-        domain.push_back({-5.12, 5.12});
+auto rastrigin_function_domain = [](vector<double> v){
+    vector<bool> domain;
+    for(int i =0; i<v.size(); i++){
+        domain.push_back((abs(v[i]) <= 5.12) && (abs(v[i]) <= 5.12));
     }
-    return domain;
-}
+    return count(domain.begin(), domain.end(), false);
+};
 
-auto rastrigin_function(vector<double> Xi){
-    vector<double> arguments = Xi;
+auto rastrigin_function = [](vector<double> arguments){
     int n = arguments.size();
-    double pi = 3.141592653589793;
+    double sum;
+    for(int i = 0; i < n; i++){
+        sum+= pow(arguments[i],2)-(10* cos(M_PI*arguments[i]));
+    }
+    return 10*n+sum;
+};
 
-}
-
-int main(){
-
-
-
-
+int main(int argc, char **argv){
+    uniform_real_distribution<> hump_r(-5.15, 5.12);
+    vector<double> arguments;
+    for(int i = 0; i < 25; i++){
+        arguments.push_back(hump_r(gen));
+    }
+    auto f = rastrigin_function(arguments);
+    cout<< f;
+    vector<bool> jajco = {true, true, false};
+    if(!count(jajco.begin(), jajco.end(), false)){
+        cout<<"dsafsda";
+    }
     return 0;
 }
