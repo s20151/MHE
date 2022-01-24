@@ -2,22 +2,29 @@ import os;
 import re;
 import numpy as np;
 
-temperature = {
+a = {
     "1":[],
     "2":[],
     "3":[]
 }
-iterations = {
+a = {
+    "10":[],
     "100":[],
     "1000":[],
-    "10000":[],
     "10000":[]
 }
+a = {
+    "0.001":[],
+    "0.01":[],
+    "0.1":[],
+    "0":[],
+    "1":[]
+}
 
-for method_name in temperature:
+for method_name in a:
     for problem_size in range(2, 10):
         for repeat in range(1,10):
-            cmndName = "ewolucja " + str(problem_size) +  " " + method_name + " " + str(0.3) + " " + str(1000)
+            cmndName = "ewolucja " + str(problem_size) +  " " + str(1) + " " + str(method_name) + " " + str(1000)
             print(cmndName)
             result = os.popen(cmndName)
             output = result.read()
@@ -26,7 +33,7 @@ for method_name in temperature:
                 calcTime = re.findall("[0-9.]+", calcTime[0])
                 result_val = re.findall("[0-9.]+", re.findall("result.*", output)[0])
 
-                temperature[method_name].append([problem_size, float(result_val[0]), float(calcTime[0])])
+                a[method_name].append([problem_size, float(result_val[0]), float(calcTime[0])])
 
 
 #print(statistics)
@@ -34,9 +41,9 @@ with open("temperatura/result.plt", "a") as gnuplotfile:
     gnuplotfile.write("set term png\n")
     gnuplotfile.write("set output \"result.png\"\n")
     gnuplotfile.write("plot ")
-    for method_name in temperature:
+    for method_name in a:
         print(method_name)
-        summary = temperature[method_name]
+        summary = a[method_name]
         # print(summary)
         per_size = {}
         for values in summary:
