@@ -87,13 +87,29 @@ vector<double> generate_neighbour(vector<double> wrk_pnt){
 }
 
 int main(int argc, char **argv){
-    int temp_arg, iterations_arg, k_arg;
     vector<double> arguments = {5 , 4 , 3, 1, 3};
-    uniform_real_distribution<double> shift = uniform_real_distribution<double> (0.01, 0.05);
+    int iterations = stoi(argv[1]);
+    int temp_func = stoi(argv[2]);
+    double shift = stod(argv[3]);
     ofstream out("out.txt");
+    switch (temp_func) {
+        case 1:
+            simulated_annealing(rastrigin_function, rastrigin_function_domain, arguments,
+                                iterations, out, shift, generate_neighbour, temp_func_1);
+            out.close();
+            break;
+        case 2:
+            simulated_annealing(rastrigin_function, rastrigin_function_domain, arguments,
+                                iterations, out, shift, generate_neighbour, temp_func_2);
+            out.close();
+            break;
+        case 3:
+            simulated_annealing(rastrigin_function, rastrigin_function_domain, arguments,
+                                iterations, out, shift, generate_neighbour, temp_func_3);
+            out.close();
+            break;
+    }
 
-    simulated_annealing(rastrigin_function, rastrigin_function_domain, arguments, 1000, out, 0.3, generate_neighbour, temp_func_2);
 
-    out.close();
     return 0;
 }
