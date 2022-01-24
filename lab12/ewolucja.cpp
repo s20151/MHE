@@ -26,14 +26,10 @@ vector<double> simulated_annealing(
     uniform_real_distribution<> u_k(0.0, 1.0);
     auto p = p0;
     auto p_best = p0;
-    uniform_int_distribution<> distrib(0, p.size()-1);
     for (int i = 0; i < iterations; i++) {
-        vector<double> p2;
-        do{
-            p2 = neighbour(p);
-        }while(!f_domain(p2));
-        double y2 = f(p2);
-        if (y2 < f(p)) {
+        auto p2 = neighbour(p);
+        if(f_domain(p2)) continue;
+        if (f(p2) < f(p)) {
             p = p2;
         }else{
             double u = u_k(gen);
@@ -44,7 +40,7 @@ vector<double> simulated_annealing(
         if (f(p) < f(p_best)) {
             p_best = p;
         }
-        out <<"Xi ;" << p << " ; " << f(p) << " ; " << "iterations ;" << iterations << endl;
+        out <<"Xi ;" << p_best << " ; Y ;" << f(p_best) << " ; " << "iterations ;" << iterations << endl;
     }
     return p_best;
 }
@@ -67,34 +63,37 @@ auto rastrigin_function = [](vector<double> arguments){
 };
 
 auto temp_func_1(int k, double shift){
-    return 1000.0 / (k-shift);
+    return 1.0 / (k);
 }
 
 auto temp_func_2(int k, double shift){
-    return 1/(k-shift);
+    return pow(k, shift);
 }
 
 auto temp_func_3(int k, double shift){
-    return 1/ log(k-shift);
+    return 1/ log10(k);
 }
 
 vector<double> generate_neighbour(vector<double> wrk_pnt){
     vector<double> neighbour = wrk_pnt;
-    int index = rand()%(neighbour.size()-1);
-    neighbour[index] += 1;
+    uniform_int_distribution<int> index = uniform_int_distribution<int> (0, neighbour.size()-1);
+    uniform_int_distribution<int> choice = uniform_int_distribution<int> (0, 1);
+    if(choice(gen)) {
+        neighbour[index(gen)] -= 0.5;
+    }else{
+        neighbour[index(gen)] += 0.5;
+    }
     return neighbour;
 }
 
 int main(int argc, char **argv){
     int temp_arg, iterations_arg, k_arg;
-
-    uniform_real_distribution<> hump_r(-5.15, 5.12);
-    vector<double> arguments;
-    for(int i = 0; i < 5; i++){
-        arguments.push_back(hump_r(gen));
-    }
+    vector<double> arguments = {5 , 4 , 3, 1, 3};
     uniform_real_distribution<double> shift = uniform_real_distribution<double> (0.01, 0.05);
+    ofstream out("out.txt");
 
+    simulated_annealing(rastrigin_function, rastrigin_function_domain, arguments, 1000, out, 0.3, generate_neighbour, temp_func_2);
 
+    out.close();
     return 0;
 }
