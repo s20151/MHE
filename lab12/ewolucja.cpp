@@ -6,6 +6,7 @@
 #include <vector>
 #include <algorithm>
 #include <fstream>
+#include <chrono>
 
 using namespace std;
 
@@ -22,10 +23,15 @@ ostream& operator<<(ostream& o, vector<double> v){
 vector<double> simulated_annealing(
         function<double(vector<double>)> f, function<bool(vector<double>)> f_domain,
         vector<double> p0, int iterations, ofstream &out, double shift,
-        function<vector<double>(vector<double>)> neighbour, function<double(int, double )> T){
+        function<vector<double>(vector<double>)> neighbour, function<double(int, double )> T,
+        function<void(int i, double current_goal_val, double goal_val)>
+        on_iteration = [](int i, double current_goal_val, double goal_val) {},
+        function<void(int c, double dt)> on_statistics = [](int c, double dt){}){
     uniform_real_distribution<> u_k(0.0, 1.0);
+    auto start = chrono::steady_clock::now();
     auto p = p0;
     auto p_best = p0;
+    int iterator = 0;
     for (int i = 0; i < iterations; i++) {
         auto p2 = neighbour(p);
         if(f_domain(p2)) continue;
@@ -40,8 +46,14 @@ vector<double> simulated_annealing(
         if (f(p) < f(p_best)) {
             p_best = p;
         }
-        out <<"Xi ;" << p_best << " ; Y ;" << f(p_best) << " ; " << "iterations ;" << iterations << endl;
+        iterator++;
+        on_iteration(iterator, f(p), f(p_best));
     }
+    auto finish = chrono::steady_clock::now();
+    chrono::duration<double> duration = finish - start;
+
+    on_statistics(iterator, duration.count());
+
     return p_best;
 }
 
@@ -89,33 +101,47 @@ vector<double> generate_neighbour(vector<double> wrk_pnt){
 int main(int argc, char **argv){
     vector<double> arguments;
     uniform_real_distribution<double> bounds = uniform_real_distribution<double>(-5.12, 5.12);
-    int size = stoi(argv[1]);
-    int temp_func = stoi(argv[2]);
-    double shift = stod(argv[3]);
-    int iterations = stoi(argv[4]);
-    string outfile_name = argv[5];
+    string s_size = argv[1];
+    int size = stoi(s_size);
+    string s_temp_func = argv[2];
+    int temp_func = stoi(s_temp_func);
+    string s_shift = argv[3];
+    double shift = stod(s_shift);
+    string s_iterations = argv[4];
+    int iterations = stoi(s_iterations);
+    string outfile_name = "out.txt";
     for(int i = 0; i<size; i++){
         arguments.push_back(bounds(gen));
     }
+
+    auto step = [&](int i, double p_val, double p_best_val) {
+        cout << i << " " << p_val << " " << p_best_val << endl;
+    };
+
+    auto finish = [](int iterator, double duration){
+        cout << "# count: " << iterator << "; dt:  " << duration << endl;
+    };
+    vector<double> best;
     ofstream out(outfile_name);
     switch (temp_func) {
         case 1:
-            simulated_annealing(rastrigin_function, rastrigin_function_domain, arguments,
-                                iterations, out, shift, generate_neighbour, temp_func_1);
+            best = simulated_annealing(rastrigin_function, rastrigin_function_domain, arguments,
+                                iterations, out, shift, generate_neighbour, temp_func_1, step, finish);
             out.close();
             break;
         case 2:
-            simulated_annealing(rastrigin_function, rastrigin_function_domain, arguments,
-                                iterations, out, shift, generate_neighbour, temp_func_2);
+            best = simulated_annealing(rastrigin_function, rastrigin_function_domain, arguments,
+                                iterations, out, shift, generate_neighbour, temp_func_2, step, finish);
             out.close();
             break;
         case 3:
-            simulated_annealing(rastrigin_function, rastrigin_function_domain, arguments,
-                                iterations, out, shift, generate_neighbour, temp_func_3);
+            best = simulated_annealing(rastrigin_function, rastrigin_function_domain, arguments,
+                                iterations, out, shift, generate_neighbour, temp_func_3, step, finish);
             out.close();
             break;
     }
 
-
+    cout << "# best " << temp_func << " result: " <<
+         rastrigin_function(best) << endl;
     return 0;
 }

@@ -2,33 +2,41 @@ import os;
 import re;
 import numpy as np;
 
-statistics = {
-    "tabu_search":[],
-    "hill_climb_rnd":[]
+temperature = {
+    "1":[],
+    "2":[],
+    "3":[]
+}
+iterations = {
+    "100":[],
+    "1000":[],
+    "10000":[],
+    "10000":[]
 }
 
-for method_name in statistics:
-    for problem_size in range(5, 25):
-        for repeat in range(1,15):
-            cmndName = "./sript.py " + str(problem_size) +  " " + method_name + " --iterations 1000 --tabu_size 200"
+for method_name in temperature:
+    for problem_size in range(2, 10):
+        for repeat in range(1,10):
+            cmndName = "ewolucja " + str(problem_size) +  " " + method_name + " " + str(0.3) + " " + str(1000)
             print(cmndName)
             result = os.popen(cmndName)
             output = result.read()
             calcTime = re.findall("dt.*", output)
             if (len(calcTime) > 0):
-                calcTime = re.findall("[0-9.]+",calcTime[0])
-                result_val = re.findall("[0-9.]+",re.findall("result.*", output)[0])
-                statistics[method_name].append([problem_size,float(result_val[0]), float(calcTime[0])])
+                calcTime = re.findall("[0-9.]+", calcTime[0])
+                result_val = re.findall("[0-9.]+", re.findall("result.*", output)[0])
+
+                temperature[method_name].append([problem_size, float(result_val[0]), float(calcTime[0])])
 
 
 #print(statistics)
-with open("result.plt", "a") as gnuplotfile:
+with open("temperatura/result.plt", "a") as gnuplotfile:
     gnuplotfile.write("set term png\n")
     gnuplotfile.write("set output \"result.png\"\n")
     gnuplotfile.write("plot ")
-    for method_name in statistics:
+    for method_name in temperature:
         print(method_name)
-        summary = statistics[method_name]
+        summary = temperature[method_name]
         # print(summary)
         per_size = {}
         for values in summary:
