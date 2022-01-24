@@ -90,10 +90,11 @@ vector<double> generate_neighbour(vector<double> wrk_pnt){
     vector<double> neighbour = wrk_pnt;
     uniform_int_distribution<int> index = uniform_int_distribution<int> (0, neighbour.size()-1);
     uniform_int_distribution<int> choice = uniform_int_distribution<int> (0, 1);
+    normal_distribution<> distribution(-1, 1);
     if(choice(gen)) {
-        neighbour[index(gen)] -= 0.5;
+        neighbour[index(gen)] -= distribution(gen); //TODO
     }else{
-        neighbour[index(gen)] += 0.5;
+        neighbour[index(gen)] += distribution(gen);;
     }
     return neighbour;
 }

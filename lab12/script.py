@@ -2,12 +2,12 @@ import os;
 import re;
 import numpy as np;
 
-a = {
+temperature = {
     "1":[],
     "2":[],
     "3":[]
 }
-a = {
+iterations = {
     "10":[],
     "100":[],
     "1000":[],
