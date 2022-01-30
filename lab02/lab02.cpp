@@ -246,6 +246,66 @@ vector<int> generate_number_set(int amount) {
     return numbers;
 }
 
+vector<vector<int>> generate_neighbour_for_SA(vector<vector<int>> wrk_pnt){
+    random_device dev;
+    vector<vector<int>> neighbour = wrk_pnt;
+    uniform_int_distribution<int> triplet_index = uniform_int_distribution<int> (0, wrk_pnt.size()-1);
+    uniform_int_distribution<int> number_index = uniform_int_distribution<int> (0, 2);
+
+    int t_i1 = triplet_index(dev);
+    int t_i2 = triplet_index(dev);
+    int n_i1 = number_index(dev);
+    int n_i2 = number_index(dev);
+    swap(neighbour[t_i1][n_i1], neighbour[t_i2][n_i2]);
+
+    return neighbour;
+}
+
+auto temp_func(int k){
+    return 1.0 / (k);
+}
+
+vector<vector<int>> simulated_annealing(
+        vector<vector<int>> p0,
+        int iterations,
+        ofstream &out,
+        function<double(int)> T){
+
+    uniform_real_distribution<> u_k(0.0, 1.0);
+    std::random_device dev;
+    std::mt19937 rng(dev());
+
+    auto start = chrono::steady_clock::now();
+
+    auto p = p0;
+    auto p_best = p0;
+
+    int iterator = 0;
+
+    for (int i = 0; i < iterations; i++) {
+        auto p2 = generate_neighbour_for_SA(p);
+        if (goal_solution(p2) < goal_solution(p)) {
+            p = p2;
+        }else{
+            double u = u_k(dev);
+            if (u < exp(-abs(goal_solution(p2) - goal_solution(p)) / T(i))) {
+                p = p2;
+            }
+        }
+        if (goal_solution(p) < goal_solution(p_best)) {
+            p_best = p;
+        }
+        iterator++;
+    }
+    auto finish = chrono::steady_clock::now();
+    chrono::duration<double> duration = finish - start;
+
+    out << "Simulated annealing duration: ;" << duration.count() << "; Problem size: ;" << p_best.size()*3 <<
+        "; Goal value: ;" << goal_solution(p_best) << endl;
+
+    return p_best;
+}
+
 
 //
 // Genetyczny:
@@ -268,7 +328,7 @@ int main(int argc, char **argv) {
             ofstream outfile(argv[2], ios_base::app);
             for (int i = 0; i < 25; i++) {
                 vector<vector<int>> wrk_pnt = generate_working_point(data);
-                brute_force(data, wrk_pnt, outfile);
+                simulated_annealing(wrk_pnt, 100, outfile, temp_func);
             }
             outfile.close();
         } else {
